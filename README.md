@@ -1,2 +1,2 @@
 # Server-UDP_Robotarium
- UDP server t control the different robots of the robotarium
+ UDP server to control the different robots of the robotarium
