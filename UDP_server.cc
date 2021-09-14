@@ -22,8 +22,25 @@ void comRobot2();
 void comRobot3();
 void comRobot4();
 
-int main (){
- 
+int main (int argc, char* argv[]){
+    cout<<OP_MOVE_FORWARD<<endl;
+    cout<<OP_MOVE_LEFT<<endl;
+    cout<<OP_WAIT_INSTRUCTION<<endl;
+    int velocidad;//velocidad en cm/s
+    if (argc != 2){
+        cout<<"falta cm/s"<<endl;
+        exit(-1);
+    }
+    else{
+        istringstream ss(argv[1]);
+        if(!(ss >> velocidad)){
+            cerr<<"numero invalido"<<argv[1]<<endl;
+
+        }
+        else if(!ss.eof()){
+            cerr<<"trailing characters after number"<<argv[1]<<endl;
+        }
+    }
 
    
     int numbytes;
@@ -90,41 +107,41 @@ int main (){
             cout<<"(servidor) mensaje recibido de IP:"<<inet_ntoa(robot_addr.sin_addr)<<" puerto ["<<ntohs(robot_addr.sin_port)<<"] longitud["<<numbytes<<"]"<<endl;
             cout<<"(cliente) "<<buf<<endl;
 
-            operation=( struct appdata*)&buf;
-            if((numbytes< HEADER_LEN) || (numbytes != operation->len+HEADER_LEN) ){
+            operation_recv=( struct appdata*)&buf;
+            if((numbytes< HEADER_LEN) || (numbytes != operation_recv->len+HEADER_LEN) ){
 
                 cout<<"(servidor) unidad de datos incompleta\n";
                 continue;
             }
             else{
                 
-                cout<<"(servidor) id "<<operation->id;
-                cout<<" operacion solicitada [op 0x]"<<operation->op;
-                cout<<" contenido "<<operation->data<<endl;
+                cout<<"(servidor) id "<<operation_recv->id;
+                cout<<" operacion solicitada [op 0x]"<<operation_recv->op;
+                cout<<" contenido "<<operation_recv->data<<endl;
             }
 
             /* relaiza operacion solicitada por el cliente */
             error=0;
-            resultado.id=operation->id;//id
+            operation_send.id=operation_recv->id;//id
 
-            switch (operation->op){
+            switch (operation_recv->op){
                 case OP_SALUDO:
-                    resultado.op=OP_SALUDO;
-                    strcpy(resultado.data, "Saludo recibido");
-                    resultado.len =strlen(resultado.data);
+                    operation_send.op=OP_SALUDO;
+                    strcpy(operation_send.data, "Saludo recibido");
+                    operation_send.len =strlen(operation_send.data);
                 break;
                 case OP_WAIT_INSTRUCTION:
                     cout<<"esperando instruccion, escriba operacion y datos si es necesario"<<endl;
-                    cin>>resultado.op>>resultado.data;
+                    cin>>operation_send.op>>operation_send.data;
                 break;
                 default: /*operacion desconocida*/
-                    resultado.op=OP_ERROR;
-                    strcpy(resultado.data, "operacion desconocida");
-                    resultado.len =strlen(resultado.data);
+                    operation_send.op=OP_ERROR;
+                    strcpy(operation_send.data, "operacion desconocida");
+                    operation_send.len =strlen(operation_send.data);
                     error=1;
                     break;
             }
-            if((numbytes=sendto(sockfd,(char*) &resultado,resultado.len + HEADER_LEN,0,(struct sockaddr*)&robot_addr,sizeof(struct sockaddr_in)))==-1){
+            if((numbytes=sendto(sockfd,(char*) &operation_send,operation_send.len + HEADER_LEN,0,(struct sockaddr*)&robot_addr,sizeof(struct sockaddr_in)))==-1){
                 perror("recv");
                 continue;
             }
@@ -139,7 +156,7 @@ int main (){
 
     //una vez que se saben los robots operativos se procede a enviar las corrrespondientes instrucciones
     while(1){
-                    //primero se elige al robot al que se desea mandar una determinada instruccion
+                //primero se elige al robot al que se desea mandar una determinada instruccion
                 cout<<"(0)robot1"<<endl<<"(1)robot2"<<endl<<"(2)robot3"<<endl<<"(3)robot4"<<endl;
                 cout<<"eliga el robot con el cual desea comunicarse"<<endl;
                 cin>>cont;
@@ -206,7 +223,7 @@ int main (){
 
     
 void comRobot1() {
-
+            int numbytes;
             //Se crea el socket
             if((sockfd=socket(AF_INET,SOCK_DGRAM,0))==-1){
                 perror("socket");
@@ -221,6 +238,19 @@ void comRobot1() {
             robot_addr.sin_addr.s_addr=inet_addr(char_ip); //IP: ordenacion de bytes de la red
             memset(&(robot_addr.sin_zero),'\0',8); //pone a cero el resto de la estructura
             memset (buf, '\0', MAXDATASIZE); /* Pone a cero el buffer inicialmente */
+            //aqui se indica la operacion que se desea realizar
+            cout<<"ingrese operacion"<<endl;
+            cin>>operation_send.op>>operation_send.data;
+            operation_send.len = strlen (operation_send.data);
+             if ((numbytes = sendto (sockfd, (char *) &operation_send,operation_send.len + HEADER_LEN, 0,(struct sockaddr*)&robot_addr,sizeof(struct sockaddr_in))) == -1)
+            {  
+                perror ("send");
+                exit (1);
+            }
+            else{
+                cout<<"mensaje enviado"<<endl;
+            }
+
 }
 
 void comRobot2(){
