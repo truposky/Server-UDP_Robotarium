@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
+#include <sstream>
 
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -50,5 +51,5 @@ struct appdata{
 #define OP_WAIT_INSTRUCTION 0x99
 //OP_SALUDO
 
-struct appdata *operation;//message received of operation 
-struct appdata resultado;
+struct appdata *operation_recv;//message received of operation 
+struct appdata operation_send;
