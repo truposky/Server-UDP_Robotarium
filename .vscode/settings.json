@@ -1,0 +1,10 @@
+{
+    "files.associations": {
+        "string": "cpp",
+        "iostream": "cpp",
+        "ostream": "cpp",
+        "sstream": "cpp"
+    },
+    "C_Cpp.errorSquiggles": "Enabled",
+    "files.autoSave": "afterDelay"
+}

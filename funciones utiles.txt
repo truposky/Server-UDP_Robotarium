@@ -1,0 +1,15 @@
+printf("listener: got packet from %s\n",
+        inet_ntop(their_addr.ss_family, get_in_addr((struct sockaddr *)&their_addr),s, sizeof s));
+        
+        char hoststr[NI_MAXHOST];
+        char portstr[NI_MAXSERV];
+
+        int rc = getnameinfo((struct sockaddr *)&their_addr,  addr_len, hoststr, sizeof(hoststr), portstr, sizeof(portstr), NI_NUMERICHOST | NI_NUMERICSERV);
+
+        if (rc == 0) 
+              printf("New connection from %s %s\n", hoststr, portstr);
+
+                
+        printf("listener: packet is %d bytes long\n", numbytes);
+        buf[numbytes] = '\0';
+        printf("listener: packet contains \"%s\"\n", buf);
