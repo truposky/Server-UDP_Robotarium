@@ -3,7 +3,8 @@
         "string": "cpp",
         "iostream": "cpp",
         "ostream": "cpp",
-        "sstream": "cpp"
+        "sstream": "cpp",
+        "cstring": "cpp"
     },
     "C_Cpp.errorSquiggles": "Enabled",
     "files.autoSave": "afterDelay"

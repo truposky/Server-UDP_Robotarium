@@ -28,7 +28,7 @@ const int PORT = 4242;
 const int MAXDATASIZE = 256; //numero de bytes que se pueden recibir
 const int HEADER_LEN = sizeof(unsigned short)*3;
 const int MAXROBOTS = 4;
-const char IP_SERVER[] = "192.168.2.2";
+const char IP_SERVER[] = "192.168.1.2";
 /*//direcciones IP del servidor y de los distintos robots
 
 const char arduino1[] ="192.168.2.5";
@@ -52,10 +52,9 @@ struct appdata{
 #define OP_ERROR            0xFFFF
 //operaciones requeridas por central
 #define OP_SALUDO           0x0001
-#define OP_MOVE_WHEEL      0x0002
-
+#define OP_MOVE_WHEEL       0x0002
 #define OP_STOP_WHEEL       0x0003
-
+#define OP_VEL_ROBOT        0X0005//devuelve la velocidad de las ruedas en rad/s
 //operaciones cliente
 #define OP_MESSAGE_RECIVE   0x0004
 //saludo esta en ambas
