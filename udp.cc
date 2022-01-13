@@ -8,7 +8,7 @@ using namespace std;
 
 
 #define HELLOPORT "4241"
-#define MYPORT "4242"   // the port users will be connecting to
+#define MYPORT "4442"   // the port users will be connecting to
 #define MAXBUFLEN 255
 // get sockaddr, IPv4 or IPv6:
  char buf[MAXDATASIZE];
@@ -39,7 +39,7 @@ int main(void)
 
     while(1){//main loop
 
-         //primero se elige al robot al que se desea mandar una determinada instruccion
+        /* //primero se elige al robot al que se desea mandar una determinada instruccion
         cout<<"(0)robot1"<<endl<<"(1)robot2"<<endl<<"(2)robot3"<<endl<<"(3)robot4"<<endl;
         cout<<"eliga el robot con el cual desea comunicarse"<<endl;
         cin>>cont;
@@ -68,7 +68,8 @@ int main(void)
         default:
             break;
         
-        }
+        }*/
+         robot1.SetupConection(id,ip,port);
         comRobot(id,ip,port);
         
     }
@@ -171,10 +172,17 @@ int comRobot(int id,string ip,string port){
     operationSend();//se elige la operacion a enviar
     if(operation_send.op != OP_SALUDO && operation_send.op != OP_VEL_ROBOT){
         //se ingresa la informacion correspondiente a la operacion elegida.
+        double velRuedaDerecha;
+        double velRuedaIzquierda;
         cout<<"ingresa datos: ";
         cin.ignore();
-        cin>>operation_send.data;
-        operation_send.len = strlen (operation_send.data);
+        cin>>velRuedaDerecha;
+        cin.ignore();
+        cin>>velRuedaIzquierda;
+        cout<<velRuedaDerecha<<","<<velRuedaIzquierda<<endl;
+        doubleToBytes(velRuedaDerecha, &operation_send.data[0]);
+        doubleToBytes(velRuedaIzquierda, &operation_send.data[8]);
+        operation_send.len = sizeof (operation_send.data);
     }
     if ((numbytes = sendto(sockfd,(char *) &operation_send, operation_send.len+HEADER_LEN, 0,p->ai_addr, p->ai_addrlen)) == -1) {
         perror("talker: sendto");
@@ -183,7 +191,7 @@ int comRobot(int id,string ip,string port){
 
     cout<<"mensaje enviado"<<endl;
 
-    if((numbytes=recvfrom(sockfd,buf,MAXBUFLEN-1,0,(struct sockaddr*)&robot_addr, &addr_len))==-1){
+   /* if((numbytes=recvfrom(sockfd,buf,MAXBUFLEN-1,0,(struct sockaddr*)&robot_addr, &addr_len))==-1){
     }
     operation_recv=( struct appdata*)&buf;
     if((numbytes< HEADER_LEN) || (numbytes != operation_recv->len+HEADER_LEN) ){
@@ -206,15 +214,14 @@ int comRobot(int id,string ip,string port){
             cout<<" contenido "<<operation_recv->data<<endl;
         break;
         case OP_VEL_ROBOT:
-            data=operation_recv->data;
-            char del =',';
-            vector<string> speed;
-            tokenize(data,del,speed);
+            vector<double> speed;
+            speed[0] = bytesToDouble(&operation_recv->data[0]);
+            speed[1] = bytesToDouble(&operation_recv->data[8]);
             cout<<"velocidad rueda derecha: "<<speed[0]<<endl;
             cout<<"velocidad rueda izquierda: "<<speed[1]<<endl;
             break;
 
-    }
+    }*/
     
     freeaddrinfo(servinfo);
     
@@ -262,8 +269,6 @@ void operationSend(){
 
         case 0:
             operation_send.op=OP_SALUDO;
-            strcpy(operation_send.data,"Saludo");
-            operation_send.len = strlen (operation_send.data);
             break;
         case 1:
             operation_send.op=OP_MOVE_WHEEL;
@@ -277,8 +282,7 @@ void operationSend(){
             break;
         case 5:
             operation_send.op=OP_VEL_ROBOT;
-            strcpy(operation_send.data,"velocidad");
-            operation_send.len = strlen (operation_send.data);
+            
             break;
     }
 
